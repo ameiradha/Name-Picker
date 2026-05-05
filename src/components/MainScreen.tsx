@@ -6,7 +6,7 @@ import { ClassData, PickerType } from '../types';
 import Sidebar from './Sidebar';
 import ClassEditor from './ClassEditor';
 import PickerInterface from './PickerInterface';
-import { LogIn, PlusCircle, Users, Settings2, PlayCircle, Loader2 } from 'lucide-react';
+import { LogIn, PlusCircle, Users, Settings2, PlayCircle, Loader2, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function MainScreen() {
@@ -14,7 +14,13 @@ export default function MainScreen() {
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [view, setView] = useState<'editor' | 'picker'>('editor');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default to closed on mobile
+
+  // Close sidebar when selecting a class on mobile
+  const handleSelectClass = (id: string) => {
+    setSelectedClassId(id);
+    setIsSidebarOpen(false);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -95,20 +101,33 @@ export default function MainScreen() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-68px)] overflow-hidden">
-      <Sidebar 
-        classes={classes}
-        selectedClassId={selectedClassId}
-        onSelectClass={(id) => {
-          setSelectedClassId(id);
-          // Don't auto-switch view, let user decide or default to current
-        }}
-        onAddClass={handleAddClass}
-        onLogout={logout}
-        userProfile={profile}
-      />
+    <div className="flex h-full relative overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-slate-900/60 z-40 md:hidden backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={`fixed inset-y-0 left-0 z-50 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-300 ease-in-out md:flex`}>
+        <Sidebar 
+          classes={classes}
+          selectedClassId={selectedClassId}
+          onSelectClass={handleSelectClass}
+          onAddClass={handleAddClass}
+          onLogout={logout}
+          userProfile={profile}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      </div>
       
-      <main className="flex-1 overflow-auto bg-white relative">
+      <main className="flex-1 overflow-auto bg-white relative w-full">
         <AnimatePresence mode="wait">
           {!selectedClass ? (
             <motion.div 
@@ -118,6 +137,14 @@ export default function MainScreen() {
               exit={{ opacity: 0 }}
               className="h-full flex flex-col items-center justify-center text-slate-400 p-8 text-center"
             >
+              <div className="md:hidden absolute top-4 left-4">
+                <button 
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="p-2 bg-slate-100 rounded-lg text-slate-600 hover:bg-slate-200"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              </div>
               <Users className="w-16 h-16 mb-4 opacity-20" />
               <h2 className="text-xl font-medium text-slate-600">No class selected</h2>
               <p className="max-w-xs">Select a class from the sidebar or create a new one to get started.</p>
@@ -138,27 +165,35 @@ export default function MainScreen() {
               className="h-full flex flex-col"
             >
               {/* Header */}
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur sticky top-0 z-10">
-                <div>
-                  <h2 className="text-xl font-bold">{selectedClass?.name}</h2>
-                  <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">
-                    {selectedClass?.studentNames.length || 0} Students
-                  </p>
+              <div className="px-4 md:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur sticky top-0 z-10 gap-3">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <button 
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="md:hidden p-2 bg-slate-50 rounded-lg text-slate-600 flex-shrink-0"
+                  >
+                    <Menu className="w-5 h-5" />
+                  </button>
+                  <div className="overflow-hidden">
+                    <h2 className="text-lg md:text-xl font-bold truncate">{selectedClass?.name}</h2>
+                    <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-widest font-semibold">
+                      {selectedClass?.studentNames.length || 0} Students
+                    </p>
+                  </div>
                 </div>
-                <div className="flex bg-slate-100 p-1 rounded-lg">
+                <div className="flex bg-slate-100 p-1 rounded-lg flex-shrink-0">
                   <button 
                     onClick={() => setView('editor')}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'editor' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
+                    className={`flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-md text-xs md:text-sm font-medium transition-all ${view === 'editor' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}
                   >
-                    <Settings2 className="w-4 h-4" />
+                    <Settings2 className="w-4 h-4 hidden sm:inline" />
                     Manage
                   </button>
                   <button 
                     onClick={() => setView('picker')}
                     disabled={!selectedClass || selectedClass.studentNames.length === 0}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'picker' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800 disabled:opacity-30'}`}
+                    className={`flex items-center gap-2 px-3 md:px-4 py-1.5 rounded-md text-xs md:text-sm font-medium transition-all ${view === 'picker' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800 disabled:opacity-30'}`}
                   >
-                    <PlayCircle className="w-4 h-4" />
+                    <PlayCircle className="w-4 h-4 hidden sm:inline" />
                     Pick
                   </button>
                 </div>

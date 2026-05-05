@@ -99,34 +99,34 @@ export default function PickerInterface({ classData }: PickerInterfaceProps) {
   return (
     <div className="flex flex-col h-full bg-slate-50">
       {/* Top Controls */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar pb-1">
+      <div className="bg-white border-b border-slate-200 px-4 md:px-6 py-3 md:py-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3 md:gap-6 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 flex-1">
           {pickerTypes.map(type => (
             <button
               key={type.id}
               onClick={() => setCurrentPicker(type.id)}
               disabled={isPicking}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all whitespace-nowrap group ${
+              className={`flex items-center gap-2 px-3 py-1.5 md:py-2 rounded-xl transition-all whitespace-nowrap group ${
                 currentPicker === type.id 
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
                   : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <span className="text-xl group-hover:scale-110 transition-transform">{type.icon}</span>
-              <span className="text-sm font-bold">{type.label}</span>
+              <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">{type.icon}</span>
+              <span className="text-xs md:text-sm font-bold">{type.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 ml-auto">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-xs font-bold text-slate-600">
-            <Users className="w-3.5 h-3.5" />
-            {sessionPool.length} Remaining
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-full text-[10px] md:text-xs font-bold text-slate-600">
+            <Users className="w-3 md:w-3.5 h-3 md:h-3.5" />
+            <span className="hidden sm:inline">Remaining:</span> {sessionPool.length}
           </div>
           <button 
             onClick={resetSession}
             disabled={isPicking}
-            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+            className="p-1.5 md:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
             title="Reset Session"
           >
             <RotateCcw className="w-4 h-4" />
@@ -136,24 +136,24 @@ export default function PickerInterface({ classData }: PickerInterfaceProps) {
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Picking Area */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden">
           <AnimatePresence mode="wait">
             {winner && !isPicking && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.5, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 1.1 }}
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none"
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none p-4"
               >
-                <div className="bg-white p-12 rounded-[40px] shadow-2xl border-4 border-indigo-500 flex flex-col items-center text-center max-w-sm">
+                <div className="bg-white p-8 md:p-12 rounded-[32px] md:rounded-[40px] shadow-2xl border-4 border-indigo-500 flex flex-col items-center text-center max-w-sm w-full">
                   <div className="bg-indigo-100 text-indigo-600 p-2 rounded-full mb-4">
-                    <Trophy className="w-8 h-8" />
+                    <Trophy className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
-                  <h3 className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs mb-2">We have a winner!</h3>
-                  <div className="text-5xl font-black text-slate-900 mb-8 break-words w-full px-4">{winner}</div>
+                  <h3 className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-2">We have a winner!</h3>
+                  <div className="text-3xl md:text-5xl font-black text-slate-900 mb-6 md:mb-8 break-words w-full px-2 md:px-4">{winner}</div>
                   <button 
                     onClick={() => setWinner(null)}
-                    className="pointer-events-auto bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95"
+                    className="pointer-events-auto bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 w-full md:w-auto"
                   >
                     Done
                   </button>
@@ -162,7 +162,7 @@ export default function PickerInterface({ classData }: PickerInterfaceProps) {
             )}
           </AnimatePresence>
 
-          <div className="w-full h-full max-w-4xl max-h-[600px] flex items-center justify-center">
+          <div className="w-full h-full max-w-4xl max-h-[500px] md:max-h-[600px] flex items-center justify-center">
             {/* dynamic picker rendering */}
             {currentPicker === 'wheel' && (
               <WheelPicker 

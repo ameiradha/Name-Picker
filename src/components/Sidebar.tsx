@@ -1,6 +1,6 @@
 import React from 'react';
 import { ClassData, UserProfile } from '../types';
-import { Plus, Users, LogOut, GraduationCap, ChevronRight } from 'lucide-react';
+import { Plus, Users, LogOut, GraduationCap, ChevronRight, X } from 'lucide-react';
 
 interface SidebarProps {
   classes: ClassData[];
@@ -9,6 +9,7 @@ interface SidebarProps {
   onAddClass: () => void;
   onLogout: () => void;
   userProfile: UserProfile | null;
+  onClose?: () => void;
 }
 
 export default function Sidebar({ 
@@ -17,16 +18,27 @@ export default function Sidebar({
   onSelectClass, 
   onAddClass, 
   onLogout,
-  userProfile
+  userProfile,
+  onClose
 }: SidebarProps) {
   return (
-    <aside className="w-64 md:w-72 border-right border-slate-200 bg-white flex flex-col hidden md:flex">
-      <div className="p-6 border-bottom border-slate-100">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-indigo-600 text-white p-2 rounded-xl">
-            <GraduationCap className="w-6 h-6" />
+    <aside className="w-[280px] md:w-72 border-r border-slate-200 bg-white flex flex-col h-full shadow-2xl md:shadow-none">
+      <div className="p-6 border-b border-slate-100">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 text-white p-2 rounded-xl">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <h1 className="font-bold text-xl tracking-tight">Name Picker</h1>
           </div>
-          <h1 className="font-bold text-xl tracking-tight">Name Picker</h1>
+          {onClose && (
+            <button 
+              onClick={onClose}
+              className="md:hidden p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center justify-between mb-4">
@@ -66,7 +78,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="mt-auto p-6 border-top border-slate-100 space-y-4">
+      <div className="mt-auto p-6 border-t border-slate-100 space-y-4">
         {userProfile && (
           <div className="flex items-center gap-3">
             {userProfile.photoURL ? (

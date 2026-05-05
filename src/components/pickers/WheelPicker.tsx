@@ -92,7 +92,7 @@ export default function WheelPicker({ names, onResult, isPicking, onStart }: Pic
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-80 h-80 md:w-[500px] md:h-[500px]">
+      <div className="relative w-[300px] h-[300px] xs:w-80 xs:h-80 md:w-[500px] md:h-[500px]">
         {/* Pointer shadow effect */}
         <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-20">
            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -187,7 +187,7 @@ export default function WheelPicker({ names, onResult, isPicking, onStart }: Pic
       <button
         onClick={handleSpin}
         disabled={isPicking || names.length === 0}
-        className="mt-12 group relative inline-flex items-center justify-center px-12 py-5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-100 disabled:opacity-50 active:scale-95"
+        className="mt-8 md:mt-12 group relative inline-flex items-center justify-center px-8 md:px-12 py-4 md:py-5 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-100 disabled:opacity-50 active:scale-95"
       >
         <div className="absolute inset-x-0 h-full -bottom-1.5 bg-indigo-800 rounded-2xl group-hover:bottom-0 transition-all z-0" />
         <span className="relative z-10 flex items-center gap-3">
