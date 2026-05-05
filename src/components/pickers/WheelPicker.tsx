@@ -62,7 +62,6 @@ export default function WheelPicker({ names, onResult, isPicking, onStart }: Pic
     if (!names.length) return;
     const rot = (latest.rotate as number) || 0;
     const degPerName = 360 / names.length;
-    // Tick sound every sector
     const currentTickIndex = Math.floor(rot / degPerName);
     if (currentTickIndex !== lastTickRef.current) {
       sounds.playTick();
@@ -70,16 +69,25 @@ export default function WheelPicker({ names, onResult, isPicking, onStart }: Pic
     }
   }, [names.length]);
 
-  // Helper for text formatting - more aggressive scaling
+  // Helper for text formatting - more aggressive scaling to prevent overlap
   const getFontSize = (count: number) => {
     if (count <= 5) return '6';
     if (count <= 10) return '5';
-    if (count <= 20) return '3.5';
+    if (count <= 20) return '4';
     if (count <= 40) return '2.5';
     if (count <= 60) return '1.8';
     if (count <= 100) return '1.2';
     if (count <= 150) return '0.8';
     return '0.6';
+  };
+
+  const getColor = (i: number, total: number) => {
+    const base = i % colors.length;
+    // Special case for last slice to prevent it having same color as the first slice
+    if (i === total - 1 && base === 0 && total > 1) {
+      return colors[1 % colors.length];
+    }
+    return colors[base];
   };
 
   return (
@@ -135,33 +143,29 @@ export default function WheelPicker({ names, onResult, isPicking, onStart }: Pic
               const d = `M 50 50 L ${x1} ${y1} A 50 50 0 ${largeArc} 1 ${x2} ${y2} Z`;
 
               return (
-                <g key={`${name}-${i}`}>
+                <g key={`slice-${i}`}>
                   <path 
                     d={d} 
-                    fill={colors[i % colors.length]} 
+                    fill={getColor(i, names.length)} 
                     stroke="white" 
-                    strokeWidth={names.length > 50 ? "0.1" : "0.4"} 
+                    strokeWidth={names.length > 50 ? "0.05" : "0.4"} 
                   />
-                  {/* Color segment overlay to prevent wrap-around collision */}
-                  {i === names.length - 1 && i % colors.length === 0 && names.length > 1 && (
-                    <path d={d} fill={colors[1]} stroke="white" strokeWidth={names.length > 50 ? "0.1" : "0.4"} />
-                  )}
                   
-                  {names.length <= 150 && (
+                  {names.length <= 200 && (
                     <g transform={`rotate(${midAngle}, 50, 50)`}>
                       <text
-                        x={shouldFlip ? 22 : 78}
+                        x={shouldFlip ? 20 : 80}
                         y="50"
-                        transform={shouldFlip ? "rotate(180, 22, 50)" : ""}
+                        transform={shouldFlip ? "rotate(180, 20, 50)" : ""}
                         fill="white"
                         fontSize={getFontSize(names.length)}
                         fontWeight="900"
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="select-none pointer-events-none"
-                        style={{ filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.2))' }}
+                        style={{ filter: 'drop-shadow(0px 1px 1px rgba(0,0,0,0.5))' }}
                       >
-                        {name.length > (names.length > 60 ? 10 : 20) ? name.substring(0, names.length > 60 ? 8 : 17) + '...' : name}
+                        {name.length > 25 ? name.substring(0, 22) + '...' : name}
                       </text>
                     </g>
                   )}
